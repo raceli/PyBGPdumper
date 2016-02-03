@@ -1,8 +1,13 @@
 import os,sys
-FileName='test'
+FileName=sys.argv[1]
+SaveName=sys.argv[2]
+print "open:"+str(FileName)
+print "saveto:"+str(SaveName)
 OpenFilePointer=open(FileName,'rb')  
-SaveFilePointer=open("save.txt",'w')
+SaveFilePointer=open(SaveName,'w')
 OpenFilePointer.seek(0,0)
+PeerIP=""
+PeerAS=""
 global RestOpenFileLength
 RestOpenFileLength=os.path.getsize(FileName)
 def Skip(VarLength):
@@ -21,8 +26,6 @@ def ReadLength(VarLength):
         VarLength=VarLength-1
     return TempReturnValue
 while(RestOpenFileLength>0):
-    PeerIP=""
-    PeerAS=""
     TimeStamp=ReadLength(4)
     Type=ReadLength(2)
     SubType=ReadLength(2)
@@ -38,8 +41,6 @@ while(RestOpenFileLength>0):
                 MRTLength=MRTLength-ViewNameLength
                 PeerCountNum=ReadLength(2)
                 MRTLength=MRTLength-2
-                PeerIP=""
-                PeerAS=""
                 while(PeerCountNum>0):
                     PeerCountNum=PeerCountNum-1
                     PeerType=ReadLength(1)
@@ -103,10 +104,8 @@ while(RestOpenFileLength>0):
                     MRTLength=MRTLength-ASformat
                 PeerAS=PeerAS.strip(" ")
                 PeerIP=PeerIP.strip(" ")
-                firstpeerip=PeerIP.split(" ")
-                firstpeerip=firstpeerip[len(firstpeerip)-1]
-                firstpeeras=PeerAS.split(" ")
-                firstpeeras=firstpeeras[len(firstpeeras)-1]
+                PeerIP=PeerIP.split(" ")
+                PeerAS=PeerAS.split(" ")
         if(SubType==2):
             Skip(4)
             MRTLength=MRTLength-4
@@ -182,6 +181,21 @@ while(RestOpenFileLength>0):
                                         ASPath=ASPath+str(AssegmentValue)+"-"
                         ASPath=ASPath.strip(" ")
                         ASPath=ASPath.strip("-")
+                        firstpeeras=ASPath.split(" ")
+                        firstpeeras=firstpeeras[0]
+                        TmpPosition=0
+                        for i in PeerAS:
+                            if(i==firstpeeras):
+                                break
+                            else:
+                                TmpPosition=TmpPosition+1
+                        TmpIPPos=0
+                        for i in PeerIP:
+                            if(TmpIPPos==TmpPosition):
+                                firstpeerip=i
+                                break
+                            else:
+                                TmpIPPos=TmpIPPos+1
                         SaveFilePointer.write("TABLE_DUMPv2|"+str(TimeStamp)+"|B|"+firstpeerip+"|"+str(firstpeeras)+"|"+Prefix+"/"+str(PrefixLength)+"|"+ASPath+"\n")
                     else:
                         Skip(SingleAttributeLength)
