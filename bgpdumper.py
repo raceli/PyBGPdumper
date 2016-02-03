@@ -30,6 +30,170 @@ while(RestOpenFileLength>0):
     Type=ReadLength(2)
     SubType=ReadLength(2)
     MRTLength=ReadLength(4)
+    if(Type==16):
+        if(SubType==1):
+            PeerAS=ReadLength(2)
+            MRTLength=MRTLength-2
+            LocalAS=ReadLength(2)
+            MRTLength=MRTLength-2
+            Interface=ReadLength(2)
+            MRTLength=MRTLength-2
+            AddressFamlily=ReadLength(2)
+            MRTLength=MRTLength-2
+            ASformat=2
+            if(AddressFamlily==1):
+                PeerIP=str(ReadLength(1))+"."
+                PeerIP=PeerIP+str(ReadLength(1))+"."
+                PeerIP=PeerIP+str(ReadLength(1))+"."
+                PeerIP=PeerIP+str(ReadLength(1))
+                IPformat=4
+                MRTLength=MRTLength-4
+            if(AddressFamlily==2):
+                IPformat=6
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                PeerIP=PeerIP+str(TempValue.encode('hex'))
+                MRTLength=MRTLength-16
+            if(AddressFamlily==1):
+                LocalIP=str(ReadLength(1))+"."
+                LocalIP=LocalIP+str(ReadLength(1))+"."
+                LocalIP=LocalIP+str(ReadLength(1))+"."
+                LocalIP=LocalIP+str(ReadLength(1))
+                MRTLength=MRTLength-4
+            if(AddressFamlily==2):
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))+":"
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                TempValue=OpenFilePointer.read(1)
+                LocalIP=LocalIP+str(TempValue.encode('hex'))
+                MRTLength=MRTLength-16
+            Skip(16)
+            MRTLength=MRTLength-16
+            Length=ReadLength(2)
+            MRTLength=MRTLength-2
+            BType=ReadLength(1)
+            MRTLength=MRTLength-1
+            Length=Length-19
+            MRTLength=MRTLength-Length
+            if(BType==2):
+                Withdrawn=ReadLength(2)
+                Length=Length-2
+                Length=Length-Withdrawn
+                while(Withdrawn>0):
+                    PrefixLength=ReadLength(1)
+                    Withdrawn=Withdrawn-1
+                    Prefix=range(5)
+                    for i in Prefix:
+                        Prefix[i]=0
+                    tmpprefixnum=(PrefixLength+7)/8
+                    while(tmpprefixnum>0):
+                        Prefix[4-tmpprefixnum]=ReadLength(1)
+                        Withdrawn=Withdrawn-1             
+                        tmpprefixnum=tmpprefixnum-1
+                    Prefix=str(Prefix[1])+"."+str(Prefix[2])+"."+str(Prefix[3])+"."+str(Prefix[4])
+                    SaveFilePointer.write("BGP4MP|"+str(TimeStamp)+"|W|"+PeerIP+"|"+str(PeerAS)+"|"+Prefix+"/"+str(PrefixLength)+"\n")
+                AttrTotalLen=ReadLength(2)
+                Length=Length-2
+                Length=Length-AttrTotalLen
+                while(AttrTotalLen>0):
+                    Flag=ReadLength(1)
+                    AttrTotalLen=AttrTotalLen-1
+                    AType=ReadLength(1)
+                    AttrTotalLen=AttrTotalLen-1
+                    if(Flag & 16):
+                        SingleAttributeLength=ReadLength(2)
+                        AttrTotalLen=AttrTotalLen-2
+                    else:
+                        SingleAttributeLength=ReadLength(1)
+                        AttrTotalLen=AttrTotalLen-1
+                    if(AType!=2):
+                        Skip(SingleAttributeLength)
+                        AttrTotalLen=AttrTotalLen-SingleAttributeLength
+                        SingleAttributeLength=SingleAttributeLength-SingleAttributeLength
+                    if(AType==2):
+                        ASPath=""
+                        while(SingleAttributeLength>0):
+                            AssegmentType=ReadLength(1)
+                            SingleAttributeLength=SingleAttributeLength-1
+                            AttrTotalLen=AttrTotalLen-1
+                            AssegmentLength=ReadLength(1)
+                            SingleAttributeLength=SingleAttributeLength-1
+                            AttrTotalLen=AttrTotalLen-1
+                            if(AssegmentType==2):
+                                while(AssegmentLength>0):
+                                    AssegmentValue=ReadLength(2)
+                                    SingleAttributeLength=SingleAttributeLength-2
+                                    AttrTotalLen=AttrTotalLen-2
+                                    AssegmentLength=AssegmentLength-1
+                                    ASPath=ASPath+str(AssegmentValue)+" "
+                            if(AssegmentType==1):
+                                while(AssegmentLength>0):
+                                    AssegmentValue=ReadLength(2)
+                                    SingleAttributeLength=SingleAttributeLength-2
+                                    AttrTotalLen=AttrTotalLen-2
+                                    AssegmentLength=AssegmentLength-1
+                                    ASPath=ASPath+str(AssegmentValue)+"-"
+                        ASPath=ASPath.strip(" ")
+                        ASPath=ASPath.strip("-")
+                        SaveFilePointer.write("BGP4MP|"+str(TimeStamp)+"|A|"+PeerIP+"|"+str(PeerAS)+"|"+Prefix+"/"+str(PrefixLength)+"|"+ASPath+"\n")
+                Skip(Length)
+                Length=Length-Length
     if(Type==13):
         if(SubType==1):
             while(MRTLength>0):
@@ -59,48 +223,48 @@ while(RestOpenFileLength>0):
                     Skip(4)
                     MRTLength=MRTLength-4
                     if(IPformat==4):
-                        PeerIP=PeerIP+str(ReadLength(1))+"."
-                        PeerIP=PeerIP+str(ReadLength(1))+"."
-                        PeerIP=PeerIP+str(ReadLength(1))+"."
-                        PeerIP=PeerIP+str(ReadLength(1))
+                        PeerIP=str(PeerIP)+str(ReadLength(1))+"."
+                        PeerIP=str(PeerIP)+str(ReadLength(1))+"."
+                        PeerIP=str(PeerIP)+str(ReadLength(1))+"."
+                        PeerIP=str(PeerIP)+str(ReadLength(1))
                         MRTLength=MRTLength-4
                         PeerIP=PeerIP+" "
                     if(IPformat==6):
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
-                        TempValue=f.read(1)
-                        PeerIP=PeerIP+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))+":"
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
+                        TempValue=OpenFilePointer.read(1)
+                        PeerIP=str(PeerIP)+str(TempValue.encode('hex'))
                         MRTLength=MRTLength-16
                         PeerIP=PeerIP+" "
-                    PeerAS=PeerAS+str(ReadLength(ASformat))+" "
+                    PeerAS=str(PeerAS)+str(ReadLength(ASformat))+" "
                     MRTLength=MRTLength-ASformat
                 PeerAS=PeerAS.strip(" ")
                 PeerIP=PeerIP.strip(" ")
@@ -134,7 +298,7 @@ while(RestOpenFileLength>0):
                 while(BGPAttributeLength>0):
                     Flag=ReadLength(1)
                     BGPAttributeLength=BGPAttributeLength-1
-                    Type=ReadLength(1)
+                    AType=ReadLength(1)
                     BGPAttributeLength=BGPAttributeLength-1
                     if(Flag & 16):
                         SingleAttributeLength=ReadLength(2)
@@ -142,7 +306,7 @@ while(RestOpenFileLength>0):
                     else:
                         SingleAttributeLength=ReadLength(1)
                         BGPAttributeLength=BGPAttributeLength-1 
-                    if(Type==2):
+                    if(AType==2):
                         ASPath=""
                         while(SingleAttributeLength>0):
                             AssegmentType=ReadLength(1)
@@ -215,37 +379,37 @@ while(RestOpenFileLength>0):
             Prefix=Prefix+str(ReadLength(1))
             MRTLength=MRTLength-4
         if(IPformat==6):
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             Prefix=Prefix+str(TempValue.encode('hex'))
             MRTLength=MRTLength-16
         PrefixLength=ReadLength(1)
@@ -261,37 +425,37 @@ while(RestOpenFileLength>0):
             PeerIP=PeerIP+str(ReadLength(1))
             MRTLength=MRTLength-4
         if(IPformat==6):
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))+":"
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
-            TempValue=f.read(1)
+            TempValue=OpenFilePointer.read(1)
             PeerIP=PeerIP+str(TempValue.encode('hex'))
             MRTLength=MRTLength-16
         PeerAS=ReadLength(2)
@@ -345,6 +509,5 @@ while(RestOpenFileLength>0):
                 Skip(SingleAttributeLength)
                 BGPAttributeLength=BGPAttributeLength-SingleAttributeLength
                 SingleAttributeLength=SingleAttributeLength-SingleAttributeLength
-
 OpenFilePointer.close()  
 SaveFilePointer.close()
